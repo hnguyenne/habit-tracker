@@ -4,6 +4,7 @@ import com.example.habit_tracker.model.User;
 import com.example.habit_tracker.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
 
@@ -23,6 +24,10 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<String> createUser(@RequestBody User user) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String hashedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
+        
         userRepository.save(user);
         return ResponseEntity.ok("User created successfully!");
     }

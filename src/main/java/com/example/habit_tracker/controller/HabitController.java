@@ -43,4 +43,9 @@ public class HabitController {
     public void deleteHabit(@PathVariable Long id) {
         habitService.deleteHabit(id);
     }
+
+    @PutMapping("/{habitId}/complete")
+    public Habit compleHabit(@PathVariable Long habitId) {
+        return habitService.compleHabit(habitId);
+    }
 }

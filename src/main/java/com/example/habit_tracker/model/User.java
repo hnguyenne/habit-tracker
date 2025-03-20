@@ -22,4 +22,11 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
+    private int points;
+
+    public void addPoints(int points) {
+        this.points += points;
+    }
 }

@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import javax.management.RuntimeErrorException;
+
 @Service
 public class HabitService {
     @Autowired
@@ -54,6 +56,24 @@ public class HabitService {
             return habitRepository.save(habit);
         } else {
             // If the habit is not found, throw an exception
+            throw new RuntimeException("Habit not found");
+        }
+    }
+
+    public Habit compleHabit(Long habitId) {
+        Optional<Habit> habOptional = habitRepository.findById(habitId);
+
+        if(habOptional.isPresent()) {
+            Habit habit = habOptional.get();
+            User user = habit.getUser();
+
+            habit.setStreak(habit.getStreak() + 1);
+
+            user.addPoints(10);
+
+            userRepository.save(user);
+            return habitRepository.save(habit);
+        } else {
             throw new RuntimeException("Habit not found");
         }
     }

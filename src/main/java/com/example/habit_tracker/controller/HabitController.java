@@ -1,6 +1,7 @@
 package com.example.habit_tracker.controller;
 
 import com.example.habit_tracker.model.Habit;
+import com.example.habit_tracker.model.HabitLog;
 import com.example.habit_tracker.service.HabitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +47,11 @@ public class HabitController {
 
     @PutMapping("/{habitId}/complete")
     public Habit compleHabit(@PathVariable Long habitId) {
-        return habitService.compleHabit(habitId);
+        return habitService.completeHabit(habitId);
+    }
+
+    @GetMapping("/{habitId}/logs")
+    public List<HabitLog> getHabitLogs(@PathVariable Long habitId) {
+        return habitService.geHabitLogs(habitId);
     }
 }

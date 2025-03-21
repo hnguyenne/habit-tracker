@@ -1,16 +1,18 @@
 package com.example.habit_tracker.service;
 
 import com.example.habit_tracker.model.Habit;
+import com.example.habit_tracker.model.HabitLog;
+import com.example.habit_tracker.repository.HabitLogRepository;
 import com.example.habit_tracker.repository.HabitRepository;
 import com.example.habit_tracker.repository.UserRepository;
 import com.example.habit_tracker.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import javax.management.RuntimeErrorException;
 
 @Service
 public class HabitService {
@@ -19,6 +21,9 @@ public class HabitService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private HabitLogRepository habitLogRepository;
 
     // Get all habits of a user
     public List<Habit> getHabitsByUser(Long userId) {
@@ -60,12 +65,24 @@ public class HabitService {
         }
     }
 
-    public Habit compleHabit(Long habitId) {
+    public Habit completeHabit(Long habitId) {
         Optional<Habit> habOptional = habitRepository.findById(habitId);
 
         if(habOptional.isPresent()) {
             Habit habit = habOptional.get();
             User user = habit.getUser();
+
+            // Prevent multiple completions in one day
+            LocalDateTime startOfDay = LocalDateTime.now().withHour(0).withMinute(0).withSecond(0);
+            LocalDateTime endOfDay = LocalDateTime.now().withHour(23).withMinute(59).withSecond(59);
+
+            boolean alreadyCompleted = habitLogRepository.existsByHabitIdAndCompletedAtBetween(habitId, startOfDay, endOfDay);
+            if (alreadyCompleted) {
+                throw new RuntimeException("Habit already completed today!");
+            }
+
+            HabitLog habitLog = new HabitLog(habit);
+            habitLogRepository.save(habitLog);
 
             habit.setStreak(habit.getStreak() + 1);
 
@@ -82,4 +99,8 @@ public class HabitService {
     public void deleteHabit(Long id) {
         habitRepository.deleteById(id);
     }
+
+    public List<HabitLog> geHabitLogs(Long habitId) {
+        return habitLogRepository.findByHabitId(habitId);
+    } 
 }

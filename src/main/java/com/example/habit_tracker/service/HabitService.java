@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,9 +97,33 @@ public class HabitService {
         }
     }
 
+    public Map<String, Object> getHabitProgress(Long habitId) {
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new RuntimeException("Habit not found"));
+
+        int streak = habit.getStreak();
+        int completionGoal = habit.getFrequency(); // Times per week
+
+         // Get the start and end of the current week
+        LocalDateTime startOfWeek = LocalDateTime.now().with(java.time.DayOfWeek.MONDAY).toLocalDate().atStartOfDay();
+        LocalDateTime endOfWeek = startOfWeek.plusDays(6).withHour(23).withMinute(59).withSecond(59);
+
+        int completedCount = habitLogRepository.findByHabitIdAndCompletedAtBetween(habitId, startOfWeek, endOfWeek).size();
+
+        double progressPercentage = ((double) completedCount / completionGoal) * 100;
+
+        Map<String, Object> progress = new HashMap<>();
+        progress.put("habitId", habit.getId());
+        progress.put("name", habit.getName());
+        progress.put("streak", streak);
+        progress.put("progress", progressPercentage + "%");
+
+        return progress;
+    }
+
     // Delete habit
-    public void deleteHabit(Long id) {
-        habitRepository.deleteById(id);
+    public void deleteHabit(Long habitId) {
+        habitRepository.deleteById(habitId);
     }
 
     public List<HabitLog> geHabitLogs(Long habitId) {

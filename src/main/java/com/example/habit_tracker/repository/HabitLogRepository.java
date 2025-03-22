@@ -10,4 +10,5 @@ import java.util.List;
 public interface HabitLogRepository extends JpaRepository<HabitLog, Long> {
     List<HabitLog> findByHabitId(Long habitId);
     boolean existsByHabitIdAndCompletedAtBetween(Long habitId, LocalDateTime start, LocalDateTime end);
+    List<HabitLog> findByHabitIdAndCompletedAtBetween(Long habitId, LocalDateTime start, LocalDateTime end);
 }

@@ -4,9 +4,11 @@ import com.example.habit_tracker.model.Habit;
 import com.example.habit_tracker.model.HabitLog;
 import com.example.habit_tracker.service.HabitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -53,5 +55,10 @@ public class HabitController {
     @GetMapping("/{habitId}/logs")
     public List<HabitLog> getHabitLogs(@PathVariable Long habitId) {
         return habitService.geHabitLogs(habitId);
+    }
+
+    @GetMapping("/{habitId}/progress")
+    public Map<String, Object> getHabitProgress(@PathVariable Long habitId) {
+        return habitService.getHabitProgress(habitId);
     }
 }

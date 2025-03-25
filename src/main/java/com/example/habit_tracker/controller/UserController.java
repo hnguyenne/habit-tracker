@@ -1,6 +1,7 @@
 package com.example.habit_tracker.controller;
 
 import com.example.habit_tracker.service.BadgeService;
+import com.example.habit_tracker.service.HabitService;
 import com.example.habit_tracker.service.UserService;
 import com.example.habit_tracker.model.User;
 import com.example.habit_tracker.repository.UserRepository;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
+    private final HabitService habitService;
 
-    public UserController(UserRepository userRepository, UserService userService) {
+    public UserController(UserRepository userRepository, UserService userService, HabitService habitService) {
         this.userRepository = userRepository;
         this.userService = userService;
+        this.habitService = habitService;
     }
 
     @GetMapping
@@ -51,5 +55,10 @@ public class UserController {
     @GetMapping("/leaderboard")
     public ResponseEntity<List<User>> getLeaderboard(@RequestParam(defaultValue = "10") int limit) {
         return ResponseEntity.ok(userService.getLeaderboard(limit));
+    }
+    
+    @GetMapping("/{userId}/habit-summary")
+    public ResponseEntity<Map<String,Object>> getUserHabitSummary(@PathVariable Long userId) {
+        return ResponseEntity.ok(habitService.getHabitSummary(userId));
     }
 }

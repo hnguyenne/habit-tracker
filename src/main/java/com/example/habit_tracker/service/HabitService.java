@@ -129,4 +129,31 @@ public class HabitService {
     public List<HabitLog> geHabitLogs(Long habitId) {
         return habitLogRepository.findByHabitId(habitId);
     } 
+
+    //Generate daily and weekly habit summary
+    public Map<String, Object> getHabitSummary(Long userId) {
+        LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
+        LocalDateTime endOfDay = LocalDateTime.now().toLocalDate().atTime(23, 59, 59);
+
+        LocalDateTime startOfWeek = LocalDateTime.now().minusDays(7);
+        LocalDateTime endOfWeek = LocalDateTime.now();
+
+        List<Habit> userHabits = habitRepository.findByUserId(userId);
+
+        int dailyCompleted = 0;
+        int weeklyCompleted =0;
+
+        for (Habit habit : userHabits) {
+            dailyCompleted += habitLogRepository.findByHabitIdAndCompletedAtBetween(habit.getId(), startOfDay, endOfDay).size();
+            weeklyCompleted += habitLogRepository.findByHabitIdAndCompletedAtBetween(habit.getId(), startOfWeek, endOfWeek).size();
+        }
+
+        Map<String, Object> summary = new HashMap<>();
+        summary.put("userId", userId);
+        summary.put("totalHabits", userHabits.size());
+        summary.put("dailyCompleted", dailyCompleted);
+        summary.put("weeklyCompleted", weeklyCompleted);
+
+        return summary;
+    }
 }

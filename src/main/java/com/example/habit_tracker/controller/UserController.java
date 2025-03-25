@@ -1,7 +1,7 @@
 package com.example.habit_tracker.controller;
 
 import com.example.habit_tracker.service.BadgeService;
-
+import com.example.habit_tracker.service.UserService;
 import com.example.habit_tracker.model.User;
 import com.example.habit_tracker.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,11 @@ import java.util.Optional;
 @RequestMapping("/users")
 public class UserController {
     private final UserRepository userRepository;
+    private final UserService userService;
 
-    public UserController(UserRepository userRepository) {
+    public UserController(UserRepository userRepository, UserService userService) {
         this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     @GetMapping
@@ -44,5 +46,10 @@ public class UserController {
         } else {
             throw new RuntimeException("User not found");
         }
+    }
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<User>> getLeaderboard(@RequestParam(defaultValue = "10") int limit) {
+        return ResponseEntity.ok(userService.getLeaderboard(limit));
     }
 }
